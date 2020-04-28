@@ -2,16 +2,17 @@ package org.javalynx.controller.dao;
 
 import org.javalynx.model.User;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryDao implements Dao {
+public class InMemoryUserDAO implements UserDAO {
 
-    private static InMemoryDao inMemoryDao;
+    private static InMemoryUserDAO inMemoryDao;
 
     List<User> userList = new ArrayList<>();
 
-    private InMemoryDao() {}
+    private InMemoryUserDAO() {}
 
     @Override
     public List<User> getUsers() {
@@ -34,18 +35,15 @@ public class InMemoryDao implements Dao {
     }
 
     @Override
-    public User getUser(String firstName, String secondName) {
-        return null;
+    public boolean validateUser(User user) throws SQLException {
+        return false;
     }
 
-    @Override
-    public User validateUser(String firstName, String secondName, String password) {
-        return null;
-    }
 
-    public static InMemoryDao getInstance() {
+
+    public static InMemoryUserDAO getInstance() {
         if (inMemoryDao == null) {
-            inMemoryDao = new InMemoryDao();
+            inMemoryDao = new InMemoryUserDAO();
         }
         return inMemoryDao;
     }

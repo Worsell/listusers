@@ -1,6 +1,6 @@
 package org.javalynx.servlet;
 
-import org.javalynx.controller.service.CarService;
+import org.javalynx.controller.service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -8,16 +8,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 
-@WebServlet("/")
+@WebServlet("/base")
 public class ListUsersServlet extends HttpServlet {
 
-    private CarService carService = CarService.getInstance();
+    private UserService userService = UserService.getInstance();
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        getServletContext().setAttribute("users", carService.getAllUsers());
+        System.err.println("GET/LIST-USER");
+        try {
+            getServletContext().setAttribute("users", userService.getAllUsers());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         getServletContext()
                 .getRequestDispatcher("/index.jsp")
                 .forward(req, resp);
