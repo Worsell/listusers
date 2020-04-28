@@ -3,6 +3,7 @@ package org.javalynx.model;
 import com.google.common.hash.Hashing;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class User {
 
@@ -16,9 +17,17 @@ public class User {
 
     private String description;
 
-    public User(String firstName, String lastName, String password) {
+    public User() {
+
+    }
+
+    public User(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public User(String firstName, String lastName, String password) {
+        this(firstName, lastName);
         setPassword(password);
     }
 
@@ -60,6 +69,28 @@ public class User {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName);
+    }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", id=" + id +
+                ", password='" + password + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }
