@@ -10,16 +10,29 @@ public class User {
 
     private String lastName;
 
-    private int id;
+    private long id;
 
     private String password;
 
     private String description;
 
+    public User() {
+
+    }
+
     public User(String firstName, String lastName, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         setPassword(password);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public User setId(long id) {
+        this.id = id;
+        return this;
     }
 
     public String getFirstName() {
