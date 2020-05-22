@@ -44,8 +44,8 @@ public class DBHelper {
     @SuppressWarnings("UnusedDeclaration")
     private static Configuration getMySqlConfiguration() {
         Configuration configuration = new Configuration();
-        configuration.addAnnotatedClass(User.class);
 
+        configuration.addAnnotatedClass(User.class);
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/baseusers?serverTimezone=UTC");
@@ -59,7 +59,7 @@ public class DBHelper {
     }
 
     @NotNull
-    private static SessionFactory createSessionFactory() {
+    public static SessionFactory createSessionFactory() {
         Configuration configuration = getMySqlConfiguration();
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
         builder.applySettings(configuration.getProperties());

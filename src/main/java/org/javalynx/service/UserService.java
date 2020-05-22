@@ -2,7 +2,7 @@ package org.javalynx.service;
 
 import org.javalynx.DBHelper;
 import org.javalynx.dao.UserDAO;
-import org.javalynx.dao.UserJDBcDao;
+import org.javalynx.dao.UserHibernateDAO;
 import org.javalynx.model.User;
 
 import java.sql.SQLException;
@@ -12,7 +12,11 @@ public class UserService {
 
     private static UserService userService;
 
-    private static UserDAO userDAO = new UserJDBcDao(DBHelper.getMysqlConnection());
+    private UserDAO userDAO;
+
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
 
     public List<User> getAllUsers() throws SQLException {
         return userDAO.getUsers();
@@ -33,9 +37,8 @@ public class UserService {
 
     public static UserService getInstance() {
         if (userService == null) {
-            userService = new UserService();
+            userService = new UserService(new UserHibernateDAO(DBHelper.createSessionFactory()));
         }
-
         return userService;
     }
 }

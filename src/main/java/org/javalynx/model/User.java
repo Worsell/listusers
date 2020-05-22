@@ -2,19 +2,27 @@ package org.javalynx.model;
 
 import com.google.common.hash.Hashing;
 
+import javax.persistence.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Column(name = "firstname", nullable = false)
     private String firstName;
 
+    @Column(name = "lastname", nullable = false)
     private String lastName;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "password", nullable = false)
     private String password;
 
-    private String description;
 
     public User() {
 
@@ -44,15 +52,6 @@ public class User {
         return this;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public User setDescription(String description) {
-        this.description = description;
-        return this;
-    }
-
     public String getLastName() {
         return lastName;
     }
@@ -73,6 +72,16 @@ public class User {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
