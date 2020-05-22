@@ -67,5 +67,4 @@ public class DBHelper {
         return configuration.buildSessionFactory(serviceRegistry);
     }
 
-
 }

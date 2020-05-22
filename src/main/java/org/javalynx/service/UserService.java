@@ -1,6 +1,6 @@
 package org.javalynx.service;
 
-import org.javalynx.DBHelper;
+import org.javalynx.DAOFactory;
 import org.javalynx.dao.UserDAO;
 import org.javalynx.dao.UserHibernateDAO;
 import org.javalynx.model.User;
@@ -37,7 +37,7 @@ public class UserService {
 
     public static UserService getInstance() {
         if (userService == null) {
-            userService = new UserService(new UserHibernateDAO(DBHelper.createSessionFactory()));
+            userService = new UserService(DAOFactory.getDAO(UserHibernateDAO.class));
         }
         return userService;
     }

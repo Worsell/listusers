@@ -6,11 +6,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserJDBcDao implements UserDAO {
+public class UserJdbcDAO implements UserDAO {
 
     Connection connection;
 
-    public UserJDBcDao(Connection connection) {
+    public UserJdbcDAO(Connection connection) {
         this.connection = connection;
         try {
             createTable();
