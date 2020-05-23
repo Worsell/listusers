@@ -7,6 +7,7 @@ import org.javalynx.model.User;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class UserService {
 
@@ -14,8 +15,11 @@ public class UserService {
 
     private UserDAO userDAO;
 
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO) throws SQLException {
         this.userDAO = userDAO;
+        User user = new User("admin", "admin", "admin");
+        user.setRole("admin");
+        userDAO.addUser(user);
     }
 
     public List<User> getAllUsers() throws SQLException {
@@ -35,9 +39,21 @@ public class UserService {
         return userDAO.addUser(user);
     }
 
+    public String getStringAU(User user) throws SQLException {
+        String answer = userDAO.getUserById(userDAO.getIdByUser(user)).getRole();
+        if(Objects.equals(answer, "admin") || Objects.equals(answer, "user"))
+            return answer;
+        else
+            return null;
+    }
+
     public static UserService getInstance() {
         if (userService == null) {
-            userService = new UserService(DAOFactory.getDAO(UserHibernateDAO.class));
+            try {
+                userService = new UserService(DAOFactory.getDAO(UserHibernateDAO.class));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return userService;
     }

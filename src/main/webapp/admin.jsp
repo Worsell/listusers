@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="utf-16">
-    <title>таблица юзеров</title>
+    <title>admin console</title>
 </head>
 <body>
 <form action="${pageContext.request.contextPath}/create" method="GET">

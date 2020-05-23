@@ -30,7 +30,7 @@ public class DeleteUserServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect(req.getContextPath() + "/base");
+        resp.sendRedirect("/login");
     }
 
 

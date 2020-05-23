@@ -59,6 +59,6 @@ public class UpdateUserServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect(req.getContextPath() + "/");
+        resp.sendRedirect( "/admin");
     }
 }

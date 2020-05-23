@@ -22,11 +22,8 @@ public class UserHibernateDAO implements UserDAO {
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("from User");
-        System.out.println("1234");
         List<User> users = (List<User>) query.list();
-        System.out.println("1234");
 
-        System.out.println(users);
         transaction.commit();
         session.close();
         return users;
