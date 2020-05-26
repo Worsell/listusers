@@ -8,12 +8,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
 
-@WebServlet("/update")
+@WebServlet("/admin/update")
 public class UpdateUserServlet extends HttpServlet {
 
     private UserService userService = UserService.getInstance();
@@ -21,15 +20,8 @@ public class UpdateUserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        HttpSession session = req.getSession(true);
-
-        session.setAttribute("oldfirstname", req.getParameter("oldfirstname"));
-        session.setAttribute("oldlastname", req.getParameter("oldlastname"));
-        session.setAttribute("oldpassword", req.getParameter("oldpassword"));
-
         getServletContext()
-                .getRequestDispatcher("/update.jsp")
+                .getRequestDispatcher("/WEB-INF/update.jsp")
                 .forward(req, resp);
 
     }
@@ -38,23 +30,12 @@ public class UpdateUserServlet extends HttpServlet {
     //TODO
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(true);
 
-        String ofirstname = (String) session.getAttribute("oldfirstname");
-        String olastname = (String) session.getAttribute("oldlastname");
-        String opassword = (String) session.getAttribute("oldpassword");
-
-
-
-        String nfirstname = req.getParameter("newfirstname");
-        String nlastname = req.getParameter("newlastname");
-        String npassword = req.getParameter("newpassword");
-
-        User ouser = new User(ofirstname, olastname, opassword);
-        User nuser = new User(nfirstname, nlastname, npassword);
-
+        User user = new User(req.getParameter("firstname"), req.getParameter("lastname"), req.getParameter("password"));
+        user.setRole(req.getParameter("role"));
+        user.setId(Long.parseLong(req.getParameter("id")));
         try {
-            userService.updateUser(ouser, nuser);
+            userService.updateUser(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }

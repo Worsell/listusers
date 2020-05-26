@@ -5,9 +5,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.javalynx.model.User;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class UserHibernateDAO implements UserDAO {
 
@@ -18,13 +20,18 @@ public class UserHibernateDAO implements UserDAO {
     }
 
     @Override
+    @Nullable
     public List<User> getUsers() throws SQLException {
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from User");
-        List<User> users = (List<User>) query.list();
-
-        transaction.commit();
+        List<User> users = null;
+        try {
+            Query query = session.createQuery("from User");
+            users = (List<User>) query.list();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+        }
         session.close();
         return users;
     }
@@ -33,8 +40,14 @@ public class UserHibernateDAO implements UserDAO {
     public boolean addUser(User user) throws SQLException {
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.save(user);
-        transaction.commit();
+        try {
+            session.save(user);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return false;
+        }
         session.close();
         return true;
     }
@@ -45,8 +58,14 @@ public class UserHibernateDAO implements UserDAO {
         user.setId(id);
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.delete(user);
-        transaction.commit();
+        try {
+            session.delete(user);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return false;
+        }
         session.close();
         return true;
     }
@@ -57,8 +76,14 @@ public class UserHibernateDAO implements UserDAO {
         if (user.getId() == 0) return false;
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.delete(user);
-        transaction.commit();
+        try {
+            session.delete(user);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return false;
+        }
         session.close();
         return true;
     }
@@ -67,13 +92,20 @@ public class UserHibernateDAO implements UserDAO {
     public boolean validateUser(User user) throws SQLException {
         String hql = "select count(id) FROM User where firstname = :firstname and lastname = :lastname and password = :password ";
         Session session =  sessionFactory.openSession();
+        Long id = 0L;
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery(hql);
-        query.setParameter("firstname", user.getFirstName());
-        query.setParameter("lastname", user.getLastName());
-        query.setParameter("password", user.getPassword());
-        Long id = (Long) query.uniqueResult();
-        transaction.commit();
+        try {
+            Query query = session.createQuery(hql);
+            query.setParameter("firstname", user.getFirstName());
+            query.setParameter("lastname", user.getLastName());
+            query.setParameter("password", user.getPassword());
+            id = (Long) query.uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return false;
+        }
         session.close();
         return id == 1;
     }
@@ -83,44 +115,66 @@ public class UserHibernateDAO implements UserDAO {
         if (user.getId() == 0) return false;
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.saveOrUpdate(user);
-        transaction.commit();
+        try {
+            session.saveOrUpdate(user);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return false;
+        }
         session.close();
         return true;
     }
 
     @Override
+    @Nullable
     public User getUserById(long user) throws SQLException {
         if (user == 0) return null;
+        User answer;
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        User user1 = (User) session.get(User.class, user);
-        transaction.commit();
+        try {
+            answer = (User) session.get(User.class, user);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            session.close();
+            return null;
+        }
         session.close();
-        return user1;
+        return answer;
     }
 
 
     @Override
+    @Nullable
     public User getUserByFLname(String firstname, String lastname) throws SQLException {
         String hql = "FROM User where firstname = :firstname and lastname = :lastname";
         Session session =  sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery(hql);
-        query.setParameter("firstname", firstname);
-        query.setParameter("lastname", lastname);
-        User user = (User) query.uniqueResult();
-        transaction.commit();
+        User user = null;
+        try {
+            Query query = session.createQuery(hql);
+            query.setParameter("firstname", firstname);
+            query.setParameter("lastname", lastname);
+            user = (User) query.uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+        }
         session.close();
         return user;
     }
 
     @Override
+    @Nullable
     public Long getIdByFLname(String firstname, String lastname) throws SQLException {
-        return getUserByFLname(firstname, lastname).getId();
+        return Objects.requireNonNull(getUserByFLname(firstname, lastname)).getId();
     }
 
     @Override
+    @Nullable
     public Long getIdByUser(User user) throws SQLException {
         return getIdByFLname(user.getFirstName(), user.getLastName());
     }

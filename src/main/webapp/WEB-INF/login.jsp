@@ -10,5 +10,8 @@
         <input type="password" name="password" placeholder="password">
         <button>press to login</button>
     </form>
+    <form action="/logout" method="GET">
+        <button>press to login out</button>
+    </form>
 </body>
 </html>

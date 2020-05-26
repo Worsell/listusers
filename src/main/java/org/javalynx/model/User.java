@@ -10,21 +10,21 @@ import java.util.Objects;
 @Table(name = "users")
 public class User {
 
-    @Column(name = "firstname", nullable = false)
+    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "lastname", nullable = false)
+    @Column(name = "lastname")
     private String lastName;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "role")
-    private String role = "user";
+    private String role;
 
     public User() {
 

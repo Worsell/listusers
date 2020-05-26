@@ -1,6 +1,5 @@
 package org.javalynx.filter;
 
-import org.javalynx.model.User;
 import org.javalynx.service.UserService;
 
 import javax.servlet.*;
@@ -10,9 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.regex.Pattern;
 
-@WebFilter(urlPatterns = {"/admin", "/user", "/create", "/delete", "/update"}, dispatcherTypes = {DispatcherType.FORWARD, DispatcherType.REQUEST})
+@WebFilter(urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.FORWARD, DispatcherType.REQUEST})
 public class AuthorisationFilter implements Filter {
 
     private UserService userService = UserService.getInstance();
@@ -25,45 +24,37 @@ public class AuthorisationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpSession session = ((HttpServletRequest) servletRequest).getSession(true);
-        String firstname = (String) session.getAttribute("firstname");
-        String lastname = (String) session.getAttribute("lastname");
-        String password = (String) session.getAttribute("password");
 
-        if (firstname == null || lastname == null || password == null) {
-            ((HttpServletResponse) servletResponse).sendRedirect("/login");
-            return;
-        }
-        User user = new User(firstname, lastname, password);
+        Pattern adminPattern = Pattern.compile("/admin.*");
+
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
+        boolean loggedInAdmin = false;
+        boolean islogged = true;
         try {
-            // System.err.println(((HttpServletRequest) servletRequest)
-             //       .getMethod());
-            System.err.println("AAA");
-            System.err.println(((HttpServletRequest) servletRequest)
-                    .getServletPath());
-            System.err.println("AAA");
-            if (Objects.equals(((HttpServletRequest) servletRequest)
-                    .getMethod(), "GET") && Objects.equals(((HttpServletRequest) servletRequest)
-                    .getServletPath(), "/admin")) {
-                System.out.println("FILTER::ADMIN");
-                System.err.println(user);
-                if (Objects.equals(userService.getStringAU(user), "admin")) {
-                    System.err.println("FILTER::IF");
-                    filterChain.doFilter(servletRequest, servletResponse);
-                }
-                else {
-                    System.err.println("FILTER::ELSE");
-
-                    servletRequest
-                            .getRequestDispatcher("/login")
-                            .forward(servletRequest, servletResponse);
-                }
-            }
+            if (session.getAttribute("id") != null)
+                loggedInAdmin = userService.getStringAU((Long) session.getAttribute("id")).equals("admin");
+            else
+                islogged = false;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        filterChain.doFilter(servletRequest, servletResponse);
-
+        boolean allowedPathAdmin = adminPattern.matcher(path).find();
+        boolean isjsp = Pattern.compile(".*.jsp").matcher(path).find();
+        boolean isallowedAll = path.equals("/login") || path.equals("/logout");
+        if ((loggedInAdmin && allowedPathAdmin) || isjsp || isallowedAll) {
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
+        else {
+            if (!allowedPathAdmin && islogged) {
+                filterChain.doFilter(servletRequest, servletResponse);
+            }
+            else {
+                response.sendRedirect(request.getContextPath() + "/login");
+            }
+        }
     }
 
     @Override

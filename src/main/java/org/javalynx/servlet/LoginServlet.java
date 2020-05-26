@@ -20,21 +20,19 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         getServletContext()
-                .getRequestDispatcher("/login.jsp")
+                .getRequestDispatcher("/WEB-INF/login.jsp")
                 .forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("POST:LOGIN");
-
         String firstname = req.getParameter("firstname");
         String lastname = req.getParameter("lastname");
         String password = req.getParameter("password");
-        User user = new User(firstname, lastname, password);
-        String role = null;
+        User u = new User(firstname, lastname, password);
+        User user = null;
         try {
-            role = userService.getStringAU(user);
+            user = userService.getUserByFLP(u);
         } catch (SQLException e) {
             e.printStackTrace();
             getServletContext()
@@ -42,20 +40,14 @@ public class LoginServlet extends HttpServlet {
                     .forward(req, resp);
         }
         HttpSession session = req.getSession(true);
-        session.setAttribute("firstname", firstname);
-        session.setAttribute("lastname", lastname);
-        session.setAttribute("password", password);
-        assert role != null;
-        System.out.println(role);
-        switch (role) {
+        System.out.println(user.getId());
+        session.setAttribute("id", user.getId());
+        assert user.getRole() != null;
+        switch (user.getRole()) {
             case "admin":
-                System.out.println(firstname);
-                System.out.println(lastname);
-                System.out.println(password);
                 resp.sendRedirect( "/admin");
                 break;
             case "user":
-
                 resp.sendRedirect( "/user");
                 break;
             default:

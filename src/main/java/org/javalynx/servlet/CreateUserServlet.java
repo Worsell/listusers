@@ -11,18 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/create")
+@WebServlet("/admin/create")
 public class CreateUserServlet extends HttpServlet {
 
     private UserService userService = UserService.getInstance();
 
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        getServletContext()
-                .getRequestDispatcher("/create.jsp")
-                .forward(req, resp);
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -30,8 +23,9 @@ public class CreateUserServlet extends HttpServlet {
         String firstname = req.getParameter("firstname");
         String lastname = req.getParameter("lastname");
         String password = req.getParameter("password");
-
+        String role = req.getParameter("role");
         User user = new User(firstname, lastname, password);
+        user.setRole(role);
 
         try {
             userService.addUser(user);

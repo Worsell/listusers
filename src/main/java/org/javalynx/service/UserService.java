@@ -2,9 +2,10 @@ package org.javalynx.service;
 
 import org.javalynx.DAOFactory;
 import org.javalynx.dao.UserDAO;
-import org.javalynx.dao.UserHibernateDAO;
 import org.javalynx.model.User;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -26,13 +27,13 @@ public class UserService {
         return userDAO.getUsers();
     }
 
-    public boolean updateUser(User olduser, User newuser) throws SQLException {
+    public boolean updateUser(User user) throws SQLException {
         // удобнее с точки зрения бизнесс логики (в случае когда не нужна высокая производительность)
-        return userDAO.validateUser(olduser) && userDAO.updateUser(newuser.setId(userDAO.getIdByUser(olduser)));
+        return userDAO.updateUser(user);
     }
 
     public boolean removeUser(User user) throws SQLException {
-        return userDAO.validateUser(user) && userDAO.removeUser(userDAO.getUserByFLname(user.getFirstName(), user.getLastName()));
+        return userDAO.removeUser(user);
     }
 
     public boolean addUser(User user) throws SQLException {
@@ -46,12 +47,30 @@ public class UserService {
         else
             return null;
     }
+    public String getStringAU(Long id) throws SQLException {
+        String answer = userDAO.getUserById(id).getRole();
+        if(Objects.equals(answer, "admin") || Objects.equals(answer, "user"))
+            return answer;
+        else
+            return null;
+    }
+
+
+    public User getUserByFLP(User user) throws SQLException {
+        return userDAO.validateUser(user) ? userDAO.getUserByFLname(user.getFirstName(), user.getLastName()) : null;
+    }
+    public User getUserByID(Long id) throws SQLException {
+        return userDAO.getUserById(id);
+    }
+
+
 
     public static UserService getInstance() {
         if (userService == null) {
+            System.out.println(new File("/Users/ivan/Downloads/listusers/src/main/resources/dao.properties").getAbsolutePath());
             try {
-                userService = new UserService(DAOFactory.getDAO(UserHibernateDAO.class));
-            } catch (SQLException e) {
+                userService = new UserService(DAOFactory.getDAO("/Users/ivan/Downloads/listusers/src/main/resources/dao.properties"));
+            } catch (SQLException | FileNotFoundException e) {
                 e.printStackTrace();
             }
         }

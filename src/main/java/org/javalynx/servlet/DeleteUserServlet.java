@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/delete")
+@WebServlet("/admin/delete")
 public class DeleteUserServlet extends HttpServlet {
 
     private UserService userService = UserService.getInstance();
@@ -19,39 +19,33 @@ public class DeleteUserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String firstname = req.getParameter("firstname");
-        String secondname = req.getParameter("lastname");
-        String password = req.getParameter("password");
 
-        User user = new User(firstname, secondname, password);
+        User user = new User();
+        user.setId(Long.parseLong(req.getParameter("id")));
+
         try {
             userService.removeUser(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("/login");
+        resp.sendRedirect("/admin");
     }
 
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String firstname = req.getParameter("firstname");
-        String secondname = req.getParameter("lastname");
-        String password = req.getParameter("password");
+        User user = new User();
+        user.setId(Long.parseLong(req.getParameter("id")));
 
-        User user = new User(firstname, secondname, password);
         try {
             userService.removeUser(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        getServletContext()
-                .getRequestDispatcher("/delete.jsp")
-                .forward(req, resp);
+        resp.sendRedirect("/admin");
 
-        // resp.sendRedirect(req.getContextPath() + "/base");
     }
 }
