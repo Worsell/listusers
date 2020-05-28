@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 @WebFilter(urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.FORWARD, DispatcherType.REQUEST})
@@ -32,15 +31,12 @@ public class AuthorisationFilter implements Filter {
         String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
         boolean loggedInAdmin = false;
         boolean islogged = true;
-        try {
-            if (session.getAttribute("id") != null)
-                loggedInAdmin = userService.getStringAU((Long) session.getAttribute("id")).equals("admin");
-            else
-                islogged = false;
+        if (session.getAttribute("id") != null && session.getAttribute("role") != null)
+            // Убрать базу
+            loggedInAdmin = session.getAttribute("role").equals("admin");
+        else
+            islogged = false;
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         boolean allowedPathAdmin = adminPattern.matcher(path).find();
         boolean isjsp = Pattern.compile(".*.jsp").matcher(path).find();
         boolean isallowedAll = path.equals("/login") || path.equals("/logout");

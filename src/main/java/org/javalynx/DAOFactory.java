@@ -5,20 +5,20 @@ import org.javalynx.dao.UserHibernateDAO;
 import org.javalynx.dao.UserJdbcDAO;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class DAOFactory {
     @Nullable
-    public static UserDAO getDAO(String path) throws FileNotFoundException {
+    public static UserDAO getDAO() throws FileNotFoundException {
 
-        Scanner scanner = new Scanner(new File(path));
+        //System.err.println();
+        Scanner scanner = new Scanner(DAOFactory.class.getClassLoader().getResourceAsStream("dao.properties"));
         String tmp = scanner.nextLine();
         String a = tmp.split("=")[0];
-        System.out.println(a);
+        // System.out.println(a);
         String b = tmp.split("=")[1];
-        System.out.println(b);
+        //System.out.println(b);
 
         if (a.equals("dao") && b.equals("hibernate") ) {
             return new UserHibernateDAO(DBHelper.createSessionFactory());

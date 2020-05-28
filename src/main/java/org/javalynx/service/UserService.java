@@ -4,7 +4,6 @@ import org.javalynx.DAOFactory;
 import org.javalynx.dao.UserDAO;
 import org.javalynx.model.User;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
@@ -15,6 +14,8 @@ public class UserService {
     private static UserService userService;
 
     private UserDAO userDAO;
+
+
 
     public UserService(UserDAO userDAO) throws SQLException {
         this.userDAO = userDAO;
@@ -67,9 +68,8 @@ public class UserService {
 
     public static UserService getInstance() {
         if (userService == null) {
-            System.out.println(new File("/Users/ivan/Downloads/listusers/src/main/resources/dao.properties").getAbsolutePath());
             try {
-                userService = new UserService(DAOFactory.getDAO("/Users/ivan/Downloads/listusers/src/main/resources/dao.properties"));
+                userService = new UserService(DAOFactory.getDAO());
             } catch (SQLException | FileNotFoundException e) {
                 e.printStackTrace();
             }

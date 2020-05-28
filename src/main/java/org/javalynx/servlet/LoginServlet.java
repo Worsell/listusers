@@ -40,8 +40,9 @@ public class LoginServlet extends HttpServlet {
                     .forward(req, resp);
         }
         HttpSession session = req.getSession(true);
-        System.out.println(user.getId());
         session.setAttribute("id", user.getId());
+        session.setAttribute("role", user.getRole());
+
         assert user.getRole() != null;
         switch (user.getRole()) {
             case "admin":
