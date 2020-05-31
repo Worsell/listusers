@@ -34,6 +34,7 @@ public class LoginServlet extends HttpServlet {
         try {
             user = userService.getUserByFLP(u);
         } catch (SQLException e) {
+            System.out.println("ERROR");
             e.printStackTrace();
             getServletContext()
                     .getRequestDispatcher("/login")

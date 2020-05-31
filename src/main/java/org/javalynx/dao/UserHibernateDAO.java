@@ -22,30 +22,44 @@ public class UserHibernateDAO implements UserDAO {
     @Override
     @Nullable
     public List<User> getUsers() throws SQLException {
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = null;
+        Transaction transaction = null;
         List<User> users = null;
+
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             Query query = session.createQuery("from User");
             users = (List<User>) query.list();
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
         }
-        session.close();
+        if (session != null) {
+            session.close();
+        }
         return users;
     }
 
     @Override
     public boolean addUser(User user) throws SQLException {
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = null;
+        Transaction transaction = null;
+
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
             return false;
         }
         session.close();
@@ -56,14 +70,21 @@ public class UserHibernateDAO implements UserDAO {
     public boolean removeUser(long id) throws SQLException {
         User user = new User();
         user.setId(id);
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = null;
+        Transaction transaction = null;
+
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             session.delete(user);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
             return false;
         }
         session.close();
@@ -73,28 +94,18 @@ public class UserHibernateDAO implements UserDAO {
 
     @Override
     public boolean removeUser(User user) throws SQLException {
-        if (user.getId() == 0) return false;
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.delete(user);
-            transaction.commit();
-        } catch (Exception e) {
-            transaction.rollback();
-            session.close();
-            return false;
-        }
-        session.close();
-        return true;
+        return removeUser(user.getId());
     }
 
     @Override
     public boolean validateUser(User user) throws SQLException {
         String hql = "select count(id) FROM User where firstname = :firstname and lastname = :lastname and password = :password ";
-        Session session =  sessionFactory.openSession();
+        Session session = null;
         Long id = 0L;
-        Transaction transaction = session.beginTransaction();
+        Transaction transaction = null;
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             Query query = session.createQuery(hql);
             query.setParameter("firstname", user.getFirstName());
             query.setParameter("lastname", user.getLastName());
@@ -102,8 +113,12 @@ public class UserHibernateDAO implements UserDAO {
             id = (Long) query.uniqueResult();
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
             return false;
         }
         session.close();
@@ -113,14 +128,21 @@ public class UserHibernateDAO implements UserDAO {
     @Override
     public boolean updateUser(User user) throws SQLException {
         if (user.getId() == 0) return false;
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = null;
+        Transaction transaction = null;
+
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             session.saveOrUpdate(user);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
             return false;
         }
         session.close();
@@ -132,14 +154,20 @@ public class UserHibernateDAO implements UserDAO {
     public User getUserById(long user) throws SQLException {
         if (user == 0) return null;
         User answer;
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = null;
+        Transaction transaction = null;
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             answer = (User) session.get(User.class, user);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
             return null;
         }
         session.close();
@@ -151,17 +179,25 @@ public class UserHibernateDAO implements UserDAO {
     @Nullable
     public User getUserByFLname(String firstname, String lastname) throws SQLException {
         String hql = "FROM User where firstname = :firstname and lastname = :lastname";
-        Session session =  sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        User user = null;
+        Session session = null;
+        Transaction transaction = null;
+        User user;
         try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
             Query query = session.createQuery(hql);
             query.setParameter("firstname", firstname);
             query.setParameter("lastname", lastname);
             user = (User) query.uniqueResult();
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            if (session != null) {
+                session.close();
+            }
+            return null;
         }
         session.close();
         return user;

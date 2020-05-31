@@ -5,6 +5,7 @@ import org.javalynx.dao.UserDAO;
 import org.javalynx.model.User;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -71,6 +72,8 @@ public class UserService {
             try {
                 userService = new UserService(DAOFactory.getDAO());
             } catch (SQLException | FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

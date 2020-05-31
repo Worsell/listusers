@@ -25,23 +25,23 @@ public class UserJdbcDAO implements UserDAO {
     public List<User> getUsers() throws SQLException {
         connection.setAutoCommit(false);
         List<User> users = new ArrayList<>();
-        Statement statement = connection.createStatement();
-        String sql = "SELECT firstname, lastname, password, id from baseusers.users";
-        try {
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                User user = new User();
-                user.setFirstName(resultSet.getString(1));
-                user.setLastName(resultSet.getString(2));
-                user.setPassword(resultSet.getString(3));
-                user.setId(resultSet.getInt(4));
-                users.add(user);
+        try (Statement statement = connection.createStatement()) {
+            String sql = "SELECT firstname, lastname, password, id from baseusers.users";
+            try {
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.setFirstName(resultSet.getString(1));
+                    user.setLastName(resultSet.getString(2));
+                    user.setPassword(resultSet.getString(3));
+                    user.setId(resultSet.getInt(4));
+                    users.add(user);
+                }
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
             }
-            connection.commit();
-        } catch (Exception e ){
-            connection.rollback();
         }
-        statement.close();
         connection.setAutoCommit(true);
         return users;
     }
@@ -52,20 +52,20 @@ public class UserJdbcDAO implements UserDAO {
 
         String sql = "INSERT INTO baseusers.users (firstname, lastname, password) Values (?, ?, ?)";
 
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setString(1, user.getFirstName());
-            statement.setString(2, user.getLastName());
-            statement.setString(3, user.getPassword());
-            statement.executeUpdate();
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-            statement.close();
-            connection.setAutoCommit(true);
-            return false;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setString(1, user.getFirstName());
+                statement.setString(2, user.getLastName());
+                statement.setString(3, user.getPassword());
+                statement.executeUpdate();
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+                statement.close();
+                connection.setAutoCommit(true);
+                return false;
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return true;
     }
@@ -78,15 +78,15 @@ public class UserJdbcDAO implements UserDAO {
 
         String sql = "DELETE FROM baseusers.users where id = ?";
         int a = 0;
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setLong(1, id);
-            a = statement.executeUpdate();
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setLong(1, id);
+                a = statement.executeUpdate();
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return a == 1;
     }
@@ -100,15 +100,15 @@ public class UserJdbcDAO implements UserDAO {
 
         String sql = "DELETE FROM baseusers.users where id = ?";
         int a = 0;
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setLong(1, user.getId());
-            a = statement.executeUpdate();
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setLong(1, user.getId());
+                a = statement.executeUpdate();
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return a == 1;
     }
@@ -123,20 +123,20 @@ public class UserJdbcDAO implements UserDAO {
 
         String sql = "SELECT count(firstname) from baseusers.users where firstname = ? AND lastname = ? AND password = ?";
         int a = 0;
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setString(1, user.getFirstName());
-            statement.setString(2, user.getLastName());
-            statement.setString(3, user.getPassword());
-            statement.execute();
-            connection.commit();
-            ResultSet resultSet = statement.getResultSet();
-            while (resultSet.next())
-                a++;
-        } catch (Exception e) {
-            connection.rollback();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setString(1, user.getFirstName());
+                statement.setString(2, user.getLastName());
+                statement.setString(3, user.getPassword());
+                statement.execute();
+                connection.commit();
+                ResultSet resultSet = statement.getResultSet();
+                while (resultSet.next())
+                    a++;
+            } catch (Exception e) {
+                connection.rollback();
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return a == 1;
     }
@@ -148,18 +148,18 @@ public class UserJdbcDAO implements UserDAO {
         connection.setAutoCommit(false);
         int a = 0;
         String sql = "UPDATE baseusers.users set firstname = ?, lastname = ?, password = ? where id = ?";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setString(1, user.getFirstName());
-            statement.setString(2, user.getLastName());
-            statement.setString(3, user.getPassword());
-            statement.setLong(4, user.getId());
-            a = statement.executeUpdate();
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setString(1, user.getFirstName());
+                statement.setString(2, user.getLastName());
+                statement.setString(3, user.getPassword());
+                statement.setLong(4, user.getId());
+                a = statement.executeUpdate();
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return a == 1;
     }
@@ -169,23 +169,23 @@ public class UserJdbcDAO implements UserDAO {
         connection.setAutoCommit(false);
         String sql = "SELECT id, firstname, lastname, password from baseusers.users where id = ?";
         User user = new User();
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setLong(1, id);
-            statement.execute();
-            connection.commit();
-            ResultSet resultSet = statement.getResultSet();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setLong(1, id);
+                statement.execute();
+                connection.commit();
+                ResultSet resultSet = statement.getResultSet();
 
-            resultSet.next();
-            user.setFirstName(resultSet.getString(2));
-            user.setLastName(resultSet.getString(3));
-            user.setPassword(resultSet.getString(4));
-            user.setId(resultSet.getInt(1));
+                resultSet.next();
+                user.setFirstName(resultSet.getString(2));
+                user.setLastName(resultSet.getString(3));
+                user.setPassword(resultSet.getString(4));
+                user.setId(resultSet.getInt(1));
 
-        } catch (Exception e) {
-            connection.rollback();
+            } catch (Exception e) {
+                connection.rollback();
+            }
         }
-        statement.close();
         connection.setAutoCommit(true);
         return user;
     }
@@ -197,23 +197,23 @@ public class UserJdbcDAO implements UserDAO {
         String sql = "SELECT id, firstname, lastname, password from baseusers.users where firstname = ? AND lastname = ?";
         User user = new User();
 
-        PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            statement.setString(1, firstname);
-            statement.setString(2, lastname);
-            statement.execute();
-            connection.commit();
-            ResultSet resultSet = statement.getResultSet();
-            if (resultSet.next()) {
-                user.setFirstName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
-                user.setPassword(resultSet.getString(4));
-                user.setId(resultSet.getInt(1));
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try {
+                statement.setString(1, firstname);
+                statement.setString(2, lastname);
+                statement.execute();
+                connection.commit();
+                ResultSet resultSet = statement.getResultSet();
+                if (resultSet.next()) {
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
+                    user.setPassword(resultSet.getString(4));
+                    user.setId(resultSet.getInt(1));
+                }
+            } catch (Exception e) {
+                connection.rollback();
             }
-        } catch (Exception e) {
-            connection.rollback();
         }
-        statement.close();
         connection.setAutoCommit(true);
         return user;
     }
