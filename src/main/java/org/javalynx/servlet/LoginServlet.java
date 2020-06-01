@@ -41,10 +41,10 @@ public class LoginServlet extends HttpServlet {
                     .forward(req, resp);
         }
         HttpSession session = req.getSession(true);
-        session.setAttribute("id", user.getId());
-        session.setAttribute("role", user.getRole());
 
-        if (user.getRole() != null) {
+        if (user != null) {
+            session.setAttribute("id", user.getId());
+            session.setAttribute("role", user.getRole());
             switch (user.getRole()) {
                 case "admin":
                     resp.sendRedirect("/admin");
@@ -58,5 +58,5 @@ public class LoginServlet extends HttpServlet {
                 resp.sendRedirect("/login");
 
         }
-        }
+    }
 }
