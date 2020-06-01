@@ -17,7 +17,8 @@ public class AuthorisationFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+            throws IOException, ServletException {
         HttpSession session = ((HttpServletRequest) servletRequest).getSession(true);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         if (session.getAttribute("id") != null) {

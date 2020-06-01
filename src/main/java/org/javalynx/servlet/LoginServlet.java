@@ -44,16 +44,19 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("id", user.getId());
         session.setAttribute("role", user.getRole());
 
-        assert user.getRole() != null;
-        switch (user.getRole()) {
-            case "admin":
-                resp.sendRedirect( "/admin");
-                break;
-            case "user":
-                resp.sendRedirect( "/user");
-                break;
-            default:
-        }
+        if (user.getRole() != null) {
+            switch (user.getRole()) {
+                case "admin":
+                    resp.sendRedirect("/admin");
+                    break;
+                case "user":
+                    resp.sendRedirect("/user");
+                    break;
+                default:
+            }
+        } else {
+                resp.sendRedirect("/login");
 
-    }
+        }
+        }
 }
